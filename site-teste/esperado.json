@@ -1,0 +1,52 @@
+{
+  "noticias": {
+    "links": 650,
+    "bytes": 126842,
+    "latencia_ms": 180
+  },
+  "blog": {
+    "links": 120,
+    "bytes": 33125,
+    "latencia_ms": 120
+  },
+  "wiki": {
+    "links": 1100,
+    "bytes": 229546,
+    "latencia_ms": 250
+  },
+  "loja": {
+    "links": 420,
+    "bytes": 75788,
+    "latencia_ms": 200
+  },
+  "documentacao": {
+    "links": 300,
+    "bytes": 79353,
+    "latencia_ms": 90
+  },
+  "universidade": {
+    "links": 220,
+    "bytes": 40779,
+    "latencia_ms": 300
+  },
+  "forum": {
+    "links": 500,
+    "bytes": 117619,
+    "latencia_ms": 160
+  },
+  "pessoal": {
+    "links": 35,
+    "bytes": 8370,
+    "latencia_ms": 60
+  },
+  "agregador": {
+    "links": 1500,
+    "bytes": 231884,
+    "latencia_ms": 140
+  },
+  "receitas": {
+    "links": 160,
+    "bytes": 37208,
+    "latencia_ms": 110
+  }
+}

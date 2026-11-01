@@ -1,0 +1,144 @@
+{
+  "textos": {
+    "resumo_lead": "24 cenários e 81.400 requisições medidas; três resultados se destacam",
+    "resumo_rodape": "Nenhuma resposta veio com links errados: as 200 falhas (0,25% das requisições) foram todas timeouts, causados pelo limite de conexões do servidor do Ruby e explicados adiante.",
+    "conclusoes": [
+      [
+        "O cache é o fator dominante",
+        "Com o Redis, as duas versões respondem em 3 a 4 ms de mediana em todas as cargas, e a CPU do serviço não passa de 30%. Na mediana, as respostas ficaram de 67× a 1.925× mais rápidas do que sem cache."
+      ],
+      [
+        "Sem cache, o limite é a CPU de um núcleo",
+        "O Python satura em ~22 req/s e o Ruby em ~34 req/s. Passado esse ponto, mais usuários só aumentam a fila: com 200 usuários o tempo médio do Python chega a 7,8 s."
+      ],
+      [
+        "O Ruby extrai links mais rápido",
+        "Com Nokogiri (C/libxml2), o Ruby processa as páginas grandes em pouco mais da metade do tempo do BeautifulSoup (Python puro): 52% mais vazão máxima e tempos menores em todas as cargas sem cache."
+      ],
+      [
+        "O servidor HTTP também é gargalo",
+        "O WEBrick limita o Ruby a 100 conexões: com 200 usuários, 100 requisições falharam por timeout, com ou sem cache. Subindo o limite para 300, as falhas caíram de 100 para 0 com cache e para 1 sem cache (teste de diagnóstico)."
+      ],
+      [
+        "Em carga leve, a rede domina",
+        "Com 1 a 10 usuários sem cache, quase todo o tempo (~200 ms) é a busca da página na origem, e as versões praticamente empatam: 210 ms (Python) e 196 ms (Ruby) com 1 usuário."
+      ]
+    ]
+  },
+  "cards": [
+    {
+      "numero": "3–4 ms",
+      "rotulo": "mediana com cache, de 1 a 200 usuários",
+      "texto": "Sem cache, a média vai de ~200 ms (1 usuário) a 7,8 s (Python, 200 usuários). O cache deixou a mediana de 67× a 1.925× menor.",
+      "cor": "0B6B47"
+    },
+    {
+      "numero": "34 × 22",
+      "rotulo": "req/s máximos sem cache: Ruby × Python",
+      "texto": "Sem cache, o gargalo é a CPU (~97% de um núcleo). O Ruby, com Nokogiri em C, atende 52% mais requisições por segundo."
+    },
+    {
+      "numero": "100",
+      "rotulo": "conexões: o teto do Ruby (WEBrick)",
+      "texto": "Com 200 usuários, 100 requisições falharam por timeout de 60 s, mesmo com cache e CPU folgada. O Python não teve falhas."
+    }
+  ],
+  "graficos": [
+    {
+      "chip": "tempo médio",
+      "titulo": "Sem cache, o tempo médio dispara com a carga",
+      "sub": "Python vai de 210 ms (1 usuário) a 7,8 s (200); Ruby, de 196 ms a 4,1 s. Com cache, ambos ficam entre 3 e 7 ms até 100 usuários.",
+      "arquivo": "01_tempo_medio.png",
+      "w": 11.2,
+      "h": 4.705,
+      "nota": "Escala logarítmica nos dois eixos. Linhas cheias: sem cache; tracejadas: com cache. O salto do Ruby com cache em 200 usuários (663 ms) vem das 100 requisições que esperaram o timeout de 60 s: é o limite de conexões do WEBrick, explicado no slide de achado."
+    },
+    {
+      "chip": "percentis",
+      "titulo": "Com cache, 95% das respostas saem em até 11 ms",
+      "sub": "Sem cache, o p95 do Python chega a 11 s com 200 usuários. O p99 de 60 s do Ruby com 200 usuários são as requisições que esperaram o timeout.",
+      "arquivo": "02_percentis_por_cenario.png",
+      "w": 10.3,
+      "h": 4.791,
+      "nota": "Um painel por cenário (versão × cache), com mediana, p90, p95 e p99 em função do número de usuários. Mesma escala nos quatro painéis."
+    },
+    {
+      "chip": "vazão",
+      "titulo": "Vazão máxima sem cache: Python 22, Ruby 34 req/s",
+      "sub": "Com cache, os dois acompanham a demanda (≈ 1 req/s por usuário) e o Python chega a 199 req/s com 200 usuários; o Ruby para em 100 req/s.",
+      "arquivo": "03_vazao.png",
+      "w": 11.2,
+      "h": 4.705,
+      "nota": "A linha pontilhada é a demanda que os usuários virtuais geram quando o serviço responde rápido (pausa média de 1 s entre requisições). Afastar-se dela significa fila."
+    },
+    {
+      "chip": "CPU",
+      "titulo": "Sem cache, o gargalo é a CPU: ~97% de um núcleo",
+      "sub": "Com 25 usuários o Python já usa 76% do núcleo e o Ruby 56%. Com cache, a CPU fica abaixo de 30% mesmo com 200 usuários.",
+      "arquivo": "04_cpu_servico.png",
+      "w": 11.2,
+      "h": 4.705,
+      "nota": "CPU medida no processo do serviço (tempo de CPU ÷ tempo de parede). Como Python e Ruby executam um thread por vez (GIL/GVL), 100% de um núcleo é o teto prático de cada processo."
+    },
+    {
+      "chip": "ganho do cache",
+      "titulo": "O cache torna a resposta de 67× a 1.925× mais rápida",
+      "sub": "Razão entre a mediana sem e com cache. Em carga leve o ganho é a busca na origem evitada; em carga alta, também a fila de CPU evitada.",
+      "arquivo": "05_ganho_do_cache.png",
+      "w": 11.2,
+      "h": 4.705,
+      "nota": "Usamos a mediana porque a média do Ruby com 200 usuários é distorcida pelas requisições que esperaram 60 s (limite de conexões do WEBrick). A planilha traz também a razão das médias e do p95."
+    },
+    {
+      "chip": "distribuição",
+      "titulo": "Com 50 usuários sem cache, o Ruby é 3× mais rápido",
+      "sub": "Mediana sem cache: 1,3 s no Python (71% das respostas acima de 1 s) e 434 ms no Ruby. Com cache, 99% das respostas saem em até 10 ms nas duas versões.",
+      "arquivo": "06_distribuicao_50u.png",
+      "w": 11.2,
+      "h": 4.705,
+      "nota": "Curva de distribuição acumulada construída com o tempo de cada requisição, gravado pelo próprio locustfile (tempos_brutos.csv). As curvas com cache de Python e Ruby ficam sobrepostas."
+    },
+    {
+      "chip": "por URL",
+      "titulo": "Páginas maiores custam mais, e mais no Python",
+      "sub": "10 usuários, sem cache. Descontada a latência da origem, o Python gasta ~140 ms na wiki (224 KB) e o Ruby ~75 ms.",
+      "arquivo": "07_por_url_10u.png",
+      "w": 10.6,
+      "h": 4.771,
+      "nota": "O traço preto é a latência simulada de cada página; o que passa dele é download, análise do HTML, montagem do JSON e fila. Nokogiri (C/libxml2) contra BeautifulSoup com html.parser (Python puro)."
+    }
+  ],
+  "webrick": {
+    "titulo": "Achado: o Ruby trava em 100 conexões",
+    "lead": "O WEBrick, servidor que o Sinatra usa por padrão no tutorial, atende no máximo 100 conexões ao mesmo tempo",
+    "evidencias": [
+      {
+        "numero": "100 falhas",
+        "texto": "por timeout (60 s sem resposta), Ruby com cache e 200 usuários"
+      },
+      {
+        "numero": "100 req/s",
+        "texto": "de vazão, metade da demanda de ~200 req/s gerada pelos 200 usuários"
+      },
+      {
+        "numero": "18% CPU",
+        "texto": "no serviço: sobrava processamento, faltavam vagas de conexão"
+      }
+    ],
+    "explicacao": [
+      [
+        "O que acontece",
+        "Cada usuário virtual mantém uma conexão keep-alive. As 100 primeiras ocupam todas as vagas (MaxClients = 100); as demais esperam sem resposta até o timeout de 60 s do Locust. O mesmo ocorreu sem cache."
+      ],
+      [
+        "Teste de diagnóstico",
+        "Repetimos o Ruby com 200 usuários subindo o limite para 300 conexões. Com cache: 0 falhas (eram 100), 199 req/s e mediana de 3 ms. Sem cache: 1 falha (eram 100) e 35 req/s; o limite volta a ser a CPU."
+      ],
+      [
+        "E o Python?",
+        "O servidor de desenvolvimento do Flask cria uma thread por conexão, sem teto: atendeu os 200 usuários sem nenhuma falha (199 req/s com cache)."
+      ]
+    ],
+    "nota": "WEBrick::Config::General[:MaxClients] = 100 (padrão). Com 100 usuários o Ruby já estava no limite: uma única requisição esperou 25 s, o que puxou a média com cache para 6,3 ms (mediana 3 ms)."
+  }
+}

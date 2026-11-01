@@ -1,0 +1,16 @@
+{
+  "cenario": "ruby-sem-cache-200u",
+  "versao": "ruby",
+  "cache": "sem",
+  "usuarios": 200,
+  "duracao_medicao_s": 90,
+  "rampa_s": 5,
+  "taxa_spawn": 40,
+  "inicio": "2026-10-29T12:52:47",
+  "cpu_servico_pct": 96.3,
+  "memoria_max_servico_mb": 318.8,
+  "redis_acertos": 0,
+  "redis_faltas": 0,
+  "buscas_na_origem": 3054,
+  "locust_cpu_alerta": false
+}

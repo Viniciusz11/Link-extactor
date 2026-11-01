@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+venv/
+logs/
+servicos/ruby-api/logs/*.log
+apresentacao/dados_apresentacao.json

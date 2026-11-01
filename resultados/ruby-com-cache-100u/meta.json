@@ -1,0 +1,16 @@
+{
+  "cenario": "ruby-com-cache-100u",
+  "versao": "ruby",
+  "cache": "com",
+  "usuarios": 100,
+  "duracao_medicao_s": 90,
+  "rampa_s": 5,
+  "taxa_spawn": 20,
+  "inicio": "2026-10-29T12:40:54",
+  "cpu_servico_pct": 18.3,
+  "memoria_max_servico_mb": 224.5,
+  "redis_acertos": 9331,
+  "redis_faltas": 0,
+  "buscas_na_origem": 0,
+  "locust_cpu_alerta": false
+}

@@ -1,0 +1,16 @@
+{
+  "cenario": "python-sem-cache-001u",
+  "versao": "python",
+  "cache": "sem",
+  "usuarios": 1,
+  "duracao_medicao_s": 90,
+  "rampa_s": 5,
+  "taxa_spawn": 1,
+  "inicio": "2026-10-29T12:23:46",
+  "cpu_servico_pct": 3.6,
+  "memoria_max_servico_mb": 72.4,
+  "redis_acertos": 0,
+  "redis_faltas": 0,
+  "buscas_na_origem": 80,
+  "locust_cpu_alerta": false
+}

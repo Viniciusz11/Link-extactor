@@ -1,0 +1,76 @@
+{
+  "comando_locust": "locust -f locustfile.py \\\n  --host http://127.0.0.1:5000 \\\n  --headless \\\n  -u 50 -r 10 -t 95s \\\n  --reset-stats \\\n  --csv resultados/<cenario>/locust \\\n  --html resultados/<cenario>/relatorio_locust.html",
+  "versoes_ferramentas": "Locust 2.47 · Python 3.13 (Flask 3.1, BeautifulSoup 4.15) · Ruby 3.2 (Sinatra 3.0 + WEBrick, Nokogiri 1.16) · Redis 7.0\n-u usuários · -r usuários criados por segundo · -t duração (5 s de rampa + 90 s medidos)",
+  "codigo": "class UsuarioLinkExtractor(FastHttpUser):\n    wait_time = between(0.5, 1.5)   # pausa entre invocações\n\n    @task\n    def sequencia_de_10_invocacoes(self):\n        urls = random.sample(URLS, k=len(URLS))  # 10 URLs\n        for i, url in enumerate(urls):\n            with self.client.get(f\"/api/{url}\",\n                                 name=rotulo(url),\n                                 catch_response=True) as resp:\n                if resp.status_code != 200:\n                    resp.failure(f\"HTTP {resp.status_code}\")\n                elif len(resp.json()) != ESPERADO[url]:\n                    resp.failure(\"quantidade de links errada\")\n                else:\n                    resp.success()\n            if i < len(urls) - 1:\n                self.wait()   # pausa até a próxima URL\n\n# URLS = 10 páginas http://127.0.0.1:8080/<pagina>.html\n# ESPERADO = nº exato de links de cada página\n# (trecho principal; arquivo completo: locust/locustfile.py)",
+  "ambiente": [
+    {
+      "titulo": "Serviços originais, mudança mínima",
+      "texto": "Código dos passos step5 (Python) e step6 (Ruby) do repositório. Só foram acrescentados a chave CACHE_ENABLED (liga/desliga o Redis) e URI.open no Ruby, exigido pelo Ruby 3. Os processos rodaram direto na máquina, sem contêineres."
+    },
+    {
+      "titulo": "Isolamento de CPU",
+      "texto": "O serviço medido ficou preso ao núcleo 1 (taskset); Locust, Redis e o site de teste ficaram no núcleo 0. Assim o gerador de carga não rouba CPU do serviço, e o uso de CPU do serviço foi medido em cada cenário."
+    },
+    {
+      "titulo": "Páginas-alvo controladas",
+      "texto": "Em vez de sites públicos, as 10 URLs apontam para um servidor local com latência simulada de 60 a 300 ms por página. Isso torna os testes repetíveis e evita sobrecarregar sites de terceiros com milhares de requisições."
+    },
+    {
+      "titulo": "Resultado conferido",
+      "texto": "Antes da carga, um teste funcional comparou as duas versões com uma extração de referência: as 10 páginas devolveram exatamente os 5.005 links esperados, idênticos em Python e Ruby. Durante a carga, o Locust repetiu a checagem em toda resposta."
+    }
+  ],
+  "urls_nota": "Os links misturam caminhos relativos e absolutos, âncoras, query strings, mailto e imagens clicáveis (o serviço devolve \"[IMG]\" como texto).\n\nAs páginas são geradas por um script com semente fixa, então os testes podem ser repetidos com o mesmo conteúdo.\n\nA latência simulada representa o tempo de ida e volta até o site de origem, que só existe quando o serviço precisa baixar a página.",
+  "parametros": [
+    [
+      "Rampa e medição:",
+      "usuários criados em 5 s; estatísticas zeradas ao fim da rampa (--reset-stats) e coletadas por 90 s."
+    ],
+    [
+      "Com cache:",
+      "Redis limpo e aquecido com as 10 URLs antes de medir (regime permanente: todas as requisições medidas acertam o cache)."
+    ],
+    [
+      "Sem cache:",
+      "CACHE_ENABLED=false, então toda requisição baixa a página de origem e extrai os links."
+    ],
+    [
+      "Coletado:",
+      "média, mediana, mín/máx, p66…p99,9, vazão e falhas (Locust); CPU e memória do serviço; acertos/faltas do Redis; buscas na origem."
+    ]
+  ],
+  "arquivos": [
+    [
+      "resultados/planilha_resultados.xlsx",
+      "métricas dos 24 cenários, ganho do cache (fórmulas), métricas por URL, páginas e diagnóstico do WEBrick; as mesmas métricas em resultados_consolidados.csv"
+    ],
+    [
+      "resultados/<cenário>/",
+      "saída bruta de cada cenário: CSVs e relatório HTML do Locust, resumo.json, tempos_brutos.csv e meta.json"
+    ],
+    [
+      "resultados/graficos/",
+      "os gráficos desta apresentação em PNG"
+    ],
+    [
+      "resultados_diagnostico/",
+      "teste extra do Ruby com 200 usuários e limite do WEBrick em 300 conexões"
+    ],
+    [
+      "locust/locustfile.py",
+      "script completo do usuário virtual"
+    ],
+    [
+      "scripts/executar_cenarios.py",
+      "roda os 24 cenários em sequência (sobe Redis, site de teste e o serviço)"
+    ],
+    [
+      "scripts/validar_servicos.py · verificar_resultados.py",
+      "teste funcional das duas versões e checagem cruzada dos resultados"
+    ],
+    [
+      "servicos/ · site-teste/ · README.md",
+      "código dos serviços e das páginas de teste; passo a passo para reproduzir (também com sites reais ou Docker)"
+    ]
+  ]
+}
