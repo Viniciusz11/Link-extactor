@@ -105,7 +105,7 @@ pres.addSection({ title: "Abertura" });
     { x: 0.6, y: 3.15, w: 10.5, h: 0.9, fontSize: 20, color: "C9D1D9", margin: 0, isTextBox: true, objectName: "subtitulo-capa" });
   // faixa de numeros-chave do estudo
   const itens = [[String(D.n_cenarios), "cenários de teste"], [fmt(D.total_req), "requisições medidas"],
-    [String(D.n_urls), "URLs por usuário virtual"], [`${D.usuarios[0]} a ${D.usuarios[D.usuarios.length - 1]}`, "usuários virtuais simultâneos"]];
+    [String(D.n_urls), "URLs por usuário virtual"], [`${fmt(D.usuarios[0])} a ${fmt(D.usuarios[D.usuarios.length - 1])}`, "usuários virtuais simultâneos"]];
   itens.forEach(([n, t], i) => {
     const x = 0.6 + i * 3.05;
     s.addText([{ text: n, options: { fontSize: 30, bold: true, color: HX.branco, breakLine: true } },
@@ -214,7 +214,7 @@ pres.addSection({ title: "Ferramenta e método" });
     ["10 URLs diferentes", "random.sample sorteia a ordem das 10 páginas a cada sequência, para os usuários não pedirem a mesma página ao mesmo tempo"],
     ["Pausa entre invocações", "0,5 a 1,5 s (média 1 s): cada usuário gera ≈ 1 requisição/s enquanto o serviço responde rápido"],
     ["Validação do resultado", "conta como falha se o status não for 200 ou se a lista não tiver exatamente os links da página"],
-    ["Registro bruto", "o script completo também grava o tempo de cada requisição (CSV) para a curva de distribuição"],
+    ["Registro bruto", "o script completo também grava o tempo de cada requisição (CSV), usado para conferir os números e calcular a mediana exata"],
   ];
   const t = [];
   notas.forEach(([a, b], i) => {
@@ -258,8 +258,8 @@ pres.addSection({ title: "Ferramenta e método" });
 // ================================================================== 9. cenarios
 {
   const s = conteudo("Ferramenta e método", "cenários", `${D.n_cenarios} cenários de teste`);
-  lead(s, "2 versões × 2 modos de cache × 6 quantidades de usuários virtuais; cada cenário foi executado separadamente");
-  const usu = D.usuarios.join(" · ");
+  lead(s, `2 versões × 2 modos de cache × ${D.usuarios.length} quantidades de usuários virtuais; cada cenário foi executado separadamente`);
+  const usu = D.usuarios.map((u) => fmt(u)).join(" · ");
   const x0 = 2.6, y0 = 2.35, cw = 4.0, rh = 1.15;
   ["Sem cache", "Com cache (Redis)"].forEach((t, j) => s.addText(t, { x: x0 + j * (cw + 0.15), y: y0 - 0.45, w: cw, h: 0.35, fontSize: 14, bold: true, color: HX.tinta, align: "center", margin: 0, isTextBox: true }));
   [["Python", HX.py, "EAF2FC"], ["Ruby", HX.rb, "FDEFE8"]].forEach(([v, cor, fill], i) => {
@@ -314,7 +314,7 @@ if (D.webrick) {
   D.linhas.filter((r) => r.versao === v).forEach((r) => {
     const sem = r.cache === "Sem cache";
     const o = (txt, al = "right") => ({ text: txt, options: { align: al, fill: { color: sem ? "F6F8FA" : HX.branco } } });
-    linhas.push([o(r.cache, "left"), o(String(r.usuarios), "left"), o(fmt(r.requisicoes)), o(fmt(r.falhas)), o(fmtMs(r.media_ms)),
+    linhas.push([o(r.cache, "left"), o(fmt(r.usuarios), "left"), o(fmt(r.requisicoes)), o(fmt(r.falhas)), o(fmtMs(r.media_ms)),
       o(fmtMs(r.mediana_ms)), o(fmtMs(r.p90_ms)), o(fmtMs(r.p95_ms)), o(fmtMs(r.p99_ms)), o(fmt(r.req_por_s, 1)), o(fmtPct(r.cpu_servico_pct))]);
   });
   s.addTable(linhas, { x: 0.6, y: 1.95, w: 12.13, colW: [1.45, 1.0, 1.25, 0.85, 1.05, 1.05, 1.0, 1.0, 1.0, 1.28, 1.2],

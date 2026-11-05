@@ -6,11 +6,11 @@
   "duracao_medicao_s": 90,
   "rampa_s": 5,
   "taxa_spawn": 40,
-  "inicio": "2026-10-29T12:32:14",
-  "cpu_servico_pct": 98.2,
-  "memoria_max_servico_mb": 175.6,
+  "inicio": "2026-11-05T15:33:06",
+  "cpu_servico_pct": 98.6,
+  "memoria_max_servico_mb": 181.4,
   "redis_acertos": 0,
   "redis_faltas": 0,
-  "buscas_na_origem": 2202,
+  "buscas_na_origem": 2753,
   "locust_cpu_alerta": false
 }

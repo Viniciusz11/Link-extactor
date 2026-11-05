@@ -37,7 +37,7 @@ for pasta in sorted(p for p in RES.iterdir() if (p / "meta.json").exists()):
     else:
         if meta["redis_acertos"] or meta["redis_faltas"]:
             erros.append("redis usado sem cache")
-        if meta["buscas_na_origem"] < n:
+        if meta["buscas_na_origem"] < n - a["falhas"]:  # timeouts nunca chegam ao servico
             erros.append("menos buscas na origem que requisicoes")
     problemas += bool(erros)
     print(f"{meta['cenario']:24s} {n:6d} {nb:6d} {a['media_ms']:8.1f} {media_b:8.1f} {a['falhas']:6d} "

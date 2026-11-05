@@ -17,13 +17,14 @@ site-teste/               gerador e servidor das 10 páginas usadas como URL de 
 locust/locustfile.py      comportamento do usuário virtual (10 invocações, 10 URLs diferentes)
 scripts/servico.sh        sobe/derruba uma versão do serviço (com ou sem cache)
 scripts/validar_servicos.py  teste funcional: Python e Ruby devolvem exatamente os links esperados
-scripts/executar_cenarios.py roda os 24 cenários e salva as métricas
+scripts/executar_cenarios.py roda os cenários (padrão: 50, 200, 400 e 1000 usuários) e salva as métricas
 scripts/consolidar.py     junta tudo em CSV e na planilha planilha_resultados.xlsx
-scripts/graficos.py       gera os gráficos (PNG); com --slides, a versão sem título usada nos slides
+scripts/graficos.py       gera os gráficos de barras (PNG); com --slides, a versão sem título usada nos slides
 scripts/verificar_resultados.py  checagem cruzada: Locust x tempos brutos x Redis x site de origem
 scripts/diagnostico_webrick.sh   teste extra: Ruby com 200 usuários e limite do WEBrick em 300
 apresentacao/             gerador da apresentação (.pptx) e textos dos slides
 resultados/<cenario>/     saída bruta de cada cenário (CSV/HTML do Locust, resumo, tempos brutos, meta)
+resultados_anteriores_1a200/  primeira rodada (1, 10, 25, 50, 100 e 200 usuários), com gráficos de linha
 ```
 
 ## Alterações mínimas no código original
@@ -34,7 +35,7 @@ resultados/<cenario>/     saída bruta de cada cenário (CSV/HTML do Locust, res
    (o Dockerfile original usa `ruby:2.6`, onde as duas formas funcionam).
 
 3. **Ruby (só para o diagnóstico):** se a variável `WEBRICK_MAX_CLIENTS` existir, ela muda o limite de
-   conexões simultâneas do WEBrick (padrão 100). Nos 24 cenários ela não foi usada; o teste extra
+   conexões simultâneas do WEBrick (padrão 100). Nos cenários principais ela não foi usada; o teste extra
    `scripts/diagnostico_webrick.sh` repete o Ruby com 200 usuários usando 300.
 
 Nada mais foi alterado: o Flask continua no servidor de desenvolvimento (`app.run`) e o Sinatra no WEBrick, como no tutorial.
@@ -47,9 +48,11 @@ python3 -m venv venv && ./venv/bin/pip install flask beautifulsoup4 redis reques
 sudo apt-get install redis-server ruby ruby-sinatra ruby-nokogiri ruby-redis ruby-webrick   # ou: gem install sinatra nokogiri redis webrick
 
 python3 site-teste/gerar_paginas.py                          # gera as 10 páginas e esperado.json
-./venv/bin/python scripts/executar_cenarios.py               # 24 cenários (~45 min); sobe Redis e o site sozinho
+export PY=$PWD/venv/bin/python                             # python que roda o serviço Flask
+./venv/bin/python scripts/executar_cenarios.py               # 16 cenários (~30 min); sobe Redis e o site sozinho
+./venv/bin/python scripts/executar_cenarios.py --usuarios 10,50,100   # outra lista de usuários
 ./venv/bin/python scripts/consolidar.py                      # CSV + planilha
-./venv/bin/python scripts/graficos.py                        # gráficos em resultados/graficos/
+./venv/bin/python scripts/graficos.py                        # gráficos de barras em resultados/graficos/
 ```
 
 Para rodar um cenário isolado:

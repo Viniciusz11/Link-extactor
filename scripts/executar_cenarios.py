@@ -101,13 +101,15 @@ def rodar(versao, cache, usuarios, duracao, saida):
     proc = pid_servico(versao)
     cpu0, t0 = proc.cpu_times(), time.time()
     rss_max = 0
-    taxa = max(1, round(usuarios / RAMPA_S))
+    # rampa de 5 s, mas nunca mais de 100 usuarios criados por segundo (com 1000 usuarios: 10 s)
+    rampa = max(RAMPA_S, -(-usuarios // 100))
+    taxa = max(1, -(-usuarios // rampa))
     cmd = ["taskset", "-c", "0", str(VENV / "locust"), "-f", str(RAIZ / "locust/locustfile.py"),
            "--host", f"http://127.0.0.1:{porta}", "--headless", "-u", str(usuarios), "-r", str(taxa),
-           "-t", f"{RAMPA_S + duracao}s", "--reset-stats", "--only-summary", "--loglevel", "WARNING",
+           "-t", f"{rampa + duracao}s", "--reset-stats", "--only-summary", "--loglevel", "WARNING",
            "--csv", str(pasta / "locust"), "--html", str(pasta / "relatorio_locust.html")]
     env = dict(os.environ, SUMMARY_JSON=str(pasta / "resumo.json"), RAW_CSV=str(pasta / "tempos_brutos.csv"))
-    log(f"{nome}: {usuarios} usuarios, rampa {RAMPA_S}s, medicao {duracao}s")
+    log(f"{nome}: {usuarios} usuarios, rampa {rampa}s, medicao {duracao}s")
     with open(pasta / "locust_saida.txt", "w") as out:
         lp = subprocess.Popen(cmd, stdout=out, stderr=subprocess.STDOUT, env=env)
         while lp.poll() is None:
@@ -120,7 +122,7 @@ def rodar(versao, cache, usuarios, duracao, saida):
     resumo = json.loads((pasta / "resumo.json").read_text())
     meta = {
         "cenario": nome, "versao": versao, "cache": cache, "usuarios": usuarios,
-        "duracao_medicao_s": duracao, "rampa_s": RAMPA_S, "taxa_spawn": taxa,
+        "duracao_medicao_s": duracao, "rampa_s": rampa, "taxa_spawn": taxa,
         "inicio": datetime.fromtimestamp(t0).isoformat(timespec="seconds"),
         "cpu_servico_pct": round(100 * ((cpu1.user + cpu1.system) - (cpu0.user + cpu0.system)) / (t1 - t0), 1),
         "memoria_max_servico_mb": round(rss_max / 2**20, 1),
@@ -141,7 +143,7 @@ def rodar(versao, cache, usuarios, duracao, saida):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--duracao", type=int, default=90)
-    ap.add_argument("--usuarios", default="1,10,25,50,100")
+    ap.add_argument("--usuarios", default="50,200,400,1000")
     ap.add_argument("--versoes", default="python,ruby")
     ap.add_argument("--caches", default="com,sem")
     ap.add_argument("--saida", default=str(RAIZ / "resultados"))

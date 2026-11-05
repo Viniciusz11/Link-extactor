@@ -1,0 +1,11 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,/api/[universidade],CatchResponseError('HTTP 0'),44,2026-11-05T18:37:34Z,2026-11-05T18:38:09Z
+GET,/api/[documentacao],CatchResponseError('HTTP 0'),36,2026-11-05T18:37:34Z,2026-11-05T18:38:09Z
+GET,/api/[wiki],CatchResponseError('HTTP 0'),29,2026-11-05T18:37:34Z,2026-11-05T18:38:09Z
+GET,/api/[forum],CatchResponseError('HTTP 0'),38,2026-11-05T18:37:33Z,2026-11-05T18:38:09Z
+GET,/api/[receitas],CatchResponseError('HTTP 0'),31,2026-11-05T18:37:34Z,2026-11-05T18:38:09Z
+GET,/api/[loja],CatchResponseError('HTTP 0'),34,2026-11-05T18:37:34Z,2026-11-05T18:38:04Z
+GET,/api/[blog],CatchResponseError('HTTP 0'),34,2026-11-05T18:37:34Z,2026-11-05T18:38:09Z
+GET,/api/[pessoal],CatchResponseError('HTTP 0'),23,2026-11-05T18:37:34Z,2026-11-05T18:38:09Z
+GET,/api/[agregador],CatchResponseError('HTTP 0'),36,2026-11-05T18:37:33Z,2026-11-05T18:38:09Z
+GET,/api/[noticias],CatchResponseError('HTTP 0'),35,2026-11-05T18:37:34Z,2026-11-05T18:38:09Z

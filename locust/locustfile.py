@@ -59,16 +59,18 @@ class UsuarioLinkExtractor(FastHttpUser):
                 if resp.status_code != 200:
                     resp.failure(f"HTTP {resp.status_code}")
                 else:
-                    try:
-                        links = resp.json()
-                    except Exception:
-                        resp.failure("resposta nao e JSON valido")
+                    corpo = resp.content or b""
+                    # conta os links direto nos bytes (cada link tem uma chave "href"):
+                    # da o mesmo numero que len(resp.json()), mas gasta muito menos CPU,
+                    # o que evita que o proprio Locust vire o gargalo com 1000 usuarios
+                    n_links = corpo.count(b'"href"')
+                    esperado = ESPERADO.get(url)
+                    if not (corpo.lstrip().startswith(b"[") and corpo.rstrip().endswith(b"]")):
+                        resp.failure("resposta nao e uma lista JSON completa")
+                    elif esperado is not None and n_links != esperado:
+                        resp.failure(f"{n_links} links (esperado {esperado})")
                     else:
-                        esperado = ESPERADO.get(url)
-                        if esperado is not None and len(links) != esperado:
-                            resp.failure(f"{len(links)} links (esperado {esperado})")
-                        else:
-                            resp.success()
+                        resp.success()
             if i < len(urls) - 1:
                 self.wait()  # pausa entre uma invocacao e a proxima
 

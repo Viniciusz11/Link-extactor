@@ -1,0 +1,61 @@
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+GET      /api/[agregador]                                                                 922    14(1.52%) |    914       1   60022      3 |   10.13        0.15
+GET      /api/[blog]                                                                      920    11(1.20%) |    720       1   60014      3 |   10.11        0.12
+GET      /api/[documentacao]                                                              908    10(1.10%) |    664       1   60022      3 |    9.98        0.11
+GET      /api/[forum]                                                                     905     9(0.99%) |    600       1   60014      3 |    9.94        0.10
+GET      /api/[loja]                                                                      915    12(1.31%) |    820       1   60013      3 |   10.05        0.13
+GET      /api/[noticias]                                                                  927    11(1.19%) |    715       1   60013      3 |   10.18        0.12
+GET      /api/[pessoal]                                                                   909     5(0.55%) |    333       1   60021      2 |    9.99        0.05
+GET      /api/[receitas]                                                                  900     6(0.67%) |    403       1   60021      3 |    9.89        0.07
+GET      /api/[universidade]                                                              915     8(0.87%) |    527       1   60011      3 |   10.05        0.09
+GET      /api/[wiki]                                                                      911    14(1.54%) |    925       1   60023      3 |   10.01        0.15
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                      9132   100(1.10%) |    663       1   60023      3 |  100.33        1.10
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+GET      /api/[agregador]                                                                        3      4      4      5      6      8     13  60000  60000  60000  60000    922
+GET      /api/[blog]                                                                             3      3      4      4      5      7     11  60000  60000  60000  60000    920
+GET      /api/[documentacao]                                                                     3      3      4      4      5      7     10  60000  60000  60000  60000    908
+GET      /api/[forum]                                                                            3      3      4      4      5      7      9     73  60000  60000  60000    905
+GET      /api/[loja]                                                                             3      3      4      4      5      6     11  60000  60000  60000  60000    915
+GET      /api/[noticias]                                                                         3      3      4      4      6      7     12  60000  60000  60000  60000    927
+GET      /api/[pessoal]                                                                          2      3      3      4      5      6      9     11  60000  60000  60000    909
+GET      /api/[receitas]                                                                         3      3      4      4      5      7     11     23  60000  60000  60000    900
+GET      /api/[universidade]                                                                     3      3      4      4      5      7     11     22  60000  60000  60000    915
+GET      /api/[wiki]                                                                             3      4      4      5      6      7     11  60000  60000  60000  60000    911
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              3      3      4      4      5      7     11  60000  60000  60000  60000   9132
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+11                 GET /api/[noticias]: HTTP 0                                                                         
+9                  GET /api/[forum]: HTTP 0                                                                            
+12                 GET /api/[loja]: HTTP 0                                                                             
+14                 GET /api/[agregador]: HTTP 0                                                                        
+10                 GET /api/[documentacao]: HTTP 0                                                                     
+11                 GET /api/[blog]: HTTP 0                                                                             
+14                 GET /api/[wiki]: HTTP 0                                                                             
+8                  GET /api/[universidade]: HTTP 0                                                                     
+6                  GET /api/[receitas]: HTTP 0                                                                         
+5                  GET /api/[pessoal]: HTTP 0                                                                          
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+Traceback (most recent call last):
+  File "src/gevent/greenlet.py", line 912, in gevent._gevent_cgreenlet.Greenlet.run
+  File "/home/claude/venv/lib/python3.13/site-packages/locust/stats.py", line 1170, in stats_writer
+    self.requests_csv_filehandle.seek(requests_csv_data_start)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: I/O operation on closed file.
+2026-10-29T15:44:13Z <Greenlet at 0x7f8f8e78e0c0: <bound method StatsCSVFileWriter.stats_writer of <locust.stats.StatsCSVFileWriter object at 0x7f8f8e795940>>> failed with ValueError
+
+[2026-10-29 12:44:13,596] vm/CRITICAL/locust.main: Unhandled exception in greenlet: <Greenlet at 0x7f8f8e78e0c0: <bound method StatsCSVFileWriter.stats_writer of <locust.stats.StatsCSVFileWriter object at 0x7f8f8e795940>>>
+Traceback (most recent call last):
+  File "src/gevent/greenlet.py", line 912, in gevent._gevent_cgreenlet.Greenlet.run
+  File "/home/claude/venv/lib/python3.13/site-packages/locust/stats.py", line 1170, in stats_writer
+    self.requests_csv_filehandle.seek(requests_csv_data_start)
+    ^^^^^^^
+ValueError: I/O operation on closed file.
